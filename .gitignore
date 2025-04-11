@@ -7,6 +7,14 @@ out-tsc
 
 # dependencies
 node_modules
+npm-debug.log
+yarn-error.log
+
+# Nx build outputs
+dist/
+tmp/
+.nx/cache/
+.angular/cache/
 
 # IDEs and editors
 /.idea
