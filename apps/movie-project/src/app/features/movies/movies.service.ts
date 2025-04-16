@@ -9,8 +9,11 @@ export class MovieService {
   trendingMovies = signal<Movie[]>([]);
   selectedMovie = signal<Movie | null>(null);
 
-  private readonly _apiKey =
-    'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1MjBlZTU2ZWNkOWNlZmY4N2JhMmNjMTczMzVhZmNmZSIsIm5iZiI6MTc0MTMzNjAwNy44OTIsInN1YiI6IjY3Y2FhZGM3ZGNjOWMwM2ZmMGNiNWM2YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.xUbhtdKVPuNy1i6nHZIFjqGYsV0PevdzgrMUWLSCog4';
+  currentPage = signal<number>(1);
+  hasMorePages = signal<boolean>(true);
+  isLoading = signal<boolean>(false);
+
+  private readonly _apiKey = '520ee56ecd9ceff87ba2cc17335afcfe';
 
   private readonly _apiUrl = 'https://api.themoviedb.org/3';
   //   private readonly _searchTerm = signal<string>('');
@@ -18,7 +21,7 @@ export class MovieService {
   private readonly _http = inject(HttpClient);
 
   constructor() {
-    this._getMovies();
+    this.getMovies();
   }
   getMovieById(movieId: string): Observable<MovieResponse> {
     return this._http.get<MovieResponse>(
@@ -26,12 +29,20 @@ export class MovieService {
     );
   }
 
-  private _getMovies(): void {
+  getMovies(): void {
     this._http
       .get<MovieResponse>(
         `${this._apiUrl}/movie/popular?api_key=${this._apiKey}`
       )
-      .pipe(tap((response) => this.movies.set(response.results)))
+      .pipe(
+        tap((response) => {
+          const currentMovies = this.movies();
+          this.movies.set([...currentMovies, ...response.results]);
+          this.hasMorePages.set(response.page < response.total_pages);
+          this.currentPage.update((currentPage) => currentPage + 1);
+          this.isLoading.set(false);
+        })
+      )
       .subscribe(); //en la signal de movie seteamos el result, recuperamos las movies
   }
 }
