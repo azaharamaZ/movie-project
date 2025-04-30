@@ -1,12 +1,19 @@
 <!-- TODO: add deferred loading -->
 
 <app-movie-row [title]="'Trending Movies'" [movies]="trendingMovies()" />
+<!-- cuando estemos en el viewport va a ocurrir todo lo q este dentro de este bloque -->
+@defer (on viewport) {
 
-<div class="grid grid-col-2 gap-4 px-4 mx-auto mt-6 max-w-7xl md:grid-cols-4 lg:grid-cols-4">
+<div class="grid gap-4 px-4 mx-auto mt-6 grid-col-2 max-w-7xl md:grid-cols-4 lg:grid-cols-4">
     @for(movie of movies(); track $index) {
     <a [routerLink]="['/movies', movie.id]">
         <app-movie-card [movie]="movie" class="w-full" />
     </a>
     }
-
 </div>
+}
+@placeholder {
+<div class="flex justify-center p-4">
+    <div class="w-8 h-8 border-b-2 border-white rounded-full animate-spin"></div>
+</div>
+}

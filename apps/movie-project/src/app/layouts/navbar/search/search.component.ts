@@ -3,25 +3,28 @@ import {
   Component,
   inject,
   linkedSignal,
-  signal,
+  model,
 } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { MovieService } from '../../../features/movies/movies.service';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Movie } from '../../../features/movies/models/movie.interface';
+import { ImageService } from '../../../shared/image.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-search',
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, FormsModule],
   templateUrl: './search.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchComponent {
-  searchQuery = signal<string>('');
+  searchQuery = model<string>('');
 
   private readonly _router = inject(Router);
   private readonly _movieService = inject(MovieService);
+  private readonly _imageService = inject(ImageService);
 
   filteredMovies = rxResource({
     request: () => this.searchQuery, // esta forma es mas limpia
@@ -38,17 +41,14 @@ export class SearchComponent {
   //   () => this.filteredMovies.value()?.results ?? ([] as Movie[])
   // );
 
-  // Esto se puede llevar a un servicio
-  getImage(poster_path: string): string {
-    return poster_path
-      ? 'https://image.tmdb.org/t/p/w500' + poster_path
-      : './assets/poster-placeholder.png';
+  getImageUrl(posterPath: string): string {
+    return this._imageService.getImageUrl(posterPath);
   }
-  // Esto se puede mejorar usando el models
-  onSearchInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.searchQuery.set(input.value);
-  }
+
+  // onSearchInput(event: Event): void {
+  //   const input = event.target as HTMLInputElement;
+  //   this.searchQuery.set(input.value);
+  // }
 
   goToDetails(movieId: string): void {
     this._router.navigate(['/movies', movieId]);

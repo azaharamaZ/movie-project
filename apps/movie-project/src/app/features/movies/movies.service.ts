@@ -34,7 +34,9 @@ export class MovieService {
   getMovies(): void {
     this._http
       .get<MovieResponse>(
-        `${this._apiUrl}/movie/popular?api_key=${this._apiKey}`
+        `${this._apiUrl}/movie/popular?api_key=${
+          this._apiKey
+        }&page=${this.currentPage()}`
       )
       .pipe(
         tap((movies: MovieResponse) => {
