@@ -38,6 +38,12 @@ export class SearchComponent {
   //   () => this.filteredMovies.value()?.results ?? ([] as Movie[])
   // );
 
+  // Esto se puede llevar a un servicio
+  getImage(poster_path: string): string {
+    return poster_path
+      ? 'https://image.tmdb.org/t/p/w500' + poster_path
+      : './assets/poster-placeholder.png';
+  }
   // Esto se puede mejorar usando el models
   onSearchInput(event: Event): void {
     const input = event.target as HTMLInputElement;

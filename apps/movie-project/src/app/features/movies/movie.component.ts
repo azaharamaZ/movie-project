@@ -1,17 +1,12 @@
-import {
-  Component,
-  computed,
-  effect,
-  HostListener,
-  inject,
-} from '@angular/core';
+import { Component, computed, HostListener, inject } from '@angular/core';
 import { MovieService } from './movies.service';
 import { RouterLink } from '@angular/router';
 import { MovieCardComponent } from './movie-card/movie-card.component';
+import { MovieRowComponent } from './movie-row/movie-row.component';
 
 @Component({
   selector: 'app-movie',
-  imports: [RouterLink, MovieCardComponent],
+  imports: [RouterLink, MovieCardComponent, MovieRowComponent],
   templateUrl: './movie.component.html',
 })
 export class MovieComponent {
@@ -22,6 +17,8 @@ export class MovieComponent {
   private readonly _movieService = inject(MovieService);
 
   readonly movies = this._movieService.movies;
+
+  trendingMovies = computed(() => this._movieService.trendingMovies());
 
   //Controlar paginacion, escucha eventos del objeto windows -> scroll
   @HostListener('window:scroll')

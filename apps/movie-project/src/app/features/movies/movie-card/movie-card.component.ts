@@ -3,7 +3,7 @@ import { Movie } from '../models/movie.interface';
 
 @Component({
   selector: 'app-movie-card',
-  template: ` <div class="cursor-pointer" role="button">
+  template: ` <div class="cursor-pointer movie-card" role="button">
     <img
       [src]="getImageUrl()"
       (error)="setImageError(true)"
