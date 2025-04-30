@@ -22,7 +22,9 @@ export class MovieService {
 
   constructor() {
     this.getMovies();
+    this.getTrending();
   }
+
   getMovieById(movieId: string): Observable<MovieResponse> {
     return this._http.get<MovieResponse>(
       `${this._apiUrl}/movie/${movieId}?api_key=${this._apiKey}`
@@ -35,14 +37,43 @@ export class MovieService {
         `${this._apiUrl}/movie/popular?api_key=${this._apiKey}`
       )
       .pipe(
-        tap((response) => {
+        tap((movies: MovieResponse) => {
           const currentMovies = this.movies();
-          this.movies.set([...currentMovies, ...response.results]);
-          this.hasMorePages.set(response.page < response.total_pages);
+          this.movies.set([...currentMovies, ...movies.results]);
+          this.hasMorePages.set(movies.page < movies.total_pages);
           this.currentPage.update((currentPage) => currentPage + 1);
           this.isLoading.set(false);
         })
       )
       .subscribe(); //en la signal de movie seteamos el result, recuperamos las movies
+  }
+
+  getTrending(): void {
+    this._http
+      .get<MovieResponse>(
+        `${this._apiUrl}/trending/movie/day?api_key=${this._apiKey}` //docu API
+      )
+      .pipe(
+        tap((movies: MovieResponse) => this.trendingMovies.set(movies.results)),
+        tap(() => this.setRandomMovie())
+      )
+      .subscribe();
+  }
+
+  setRandomMovie() {
+    const trendingLenght = this.trendingMovies().length;
+    const randomIndex = this._getRandomInt(0, trendingLenght);
+    const randomMovie = this.trendingMovies()[randomIndex];
+    this.selectedMovie.set(randomMovie);
+  }
+
+  searchMovie(query: string): Observable<MovieResponse> {
+    return this._http.get<MovieResponse>(
+      `${this._apiUrl}/search/movie?api_key=${this._apiKey}&query=${query}`
+    );
+  }
+  // esto deberia ir en otro servicio
+  private _getRandomInt(min = 0, max = 50) {
+    return Math.floor(Math.random() * (max - min)) + min;
   }
 }
